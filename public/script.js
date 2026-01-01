@@ -22,14 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const res = await fetch("/inventory");
         const items = await res.json();
+        if (!Array.isArray(items)) throw new Error("Inventory is not an array");
         renderInventory(items);
       } catch (err) {
         console.error("Error loading inventory:", err);
+        tbody.innerHTML = `<tr><td colspan="6" style="color:red;">Failed to load inventory: ${err.message}</td></tr>`;
       }
     }
 
     function renderInventory(items) {
       tbody.innerHTML = "";
+      if (!items.length) {
+        tbody.innerHTML = "<tr><td colspan='6'>No products found</td></tr>";
+        return;
+      }
+
       items.forEach(item => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -128,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fetch("/inventory")
         .then(res => res.json())
         .then(data => {
+          if (!Array.isArray(data)) throw new Error("Inventory not an array");
           inventory = data;
           productsList.innerHTML = "";
           inventory.forEach(i => {
@@ -387,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fetch("/sales")
         .then(res => res.json())
         .then(data => {
-          allSales = data.sort((a, b) => new Date(b.soldAt) - new Date(a.soldAt));
+          allSales = Array.isArray(data) ? data.sort((a, b) => new Date(b.soldAt) - new Date(a.soldAt)) : [];
           filterAndRender();
         })
         .catch(err => console.error("Error loading sales:", err));

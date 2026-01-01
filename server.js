@@ -14,11 +14,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- MongoDB Connection ---
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB error:", err));
 
+// --- Schemas ---
 const inventorySchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, min: 0, required: true },
@@ -45,6 +47,7 @@ const salesSchema = new mongoose.Schema({
 });
 const Sale = mongoose.model("Sale", salesSchema);
 
+// --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -57,6 +60,7 @@ app.use(
   })
 );
 
+// --- Admin Auth ---
 const adminCredentials = {
   username: process.env.ADMIN_USER || "admin",
   password: process.env.ADMIN_PASS || "password"
@@ -64,13 +68,12 @@ const adminCredentials = {
 
 function isAuthenticated(req, res, next) {
   if (req.session.isAuthenticated) return next();
-  return res.redirect("/admin-login");
+  return res.status(401).json({ error: "Unauthorized. Please log in." });
 }
 
-app.get("/", isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "inventory.html"));
-});
+// --- Routes ---
 
+// Admin login pages
 app.get("/admin-login", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin-login.html"));
 });
@@ -79,11 +82,12 @@ app.post("/admin-login", (req, res) => {
   const { username, password } = req.body;
   if (username === adminCredentials.username && password === adminCredentials.password) {
     req.session.isAuthenticated = true;
-    return res.redirect("/");
+    return res.json({ success: true });
   }
-  res.redirect("/admin-login");
+  res.status(401).json({ error: "Invalid credentials" });
 });
 
+// Logout
 app.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ error: "Logout failed" });
@@ -91,11 +95,18 @@ app.post("/logout", (req, res) => {
   });
 });
 
+// Serve inventory page (only if authenticated)
+app.get("/", isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "inventory.html"));
+});
+
+// --- Inventory API ---
 app.get("/inventory", isAuthenticated, async (req, res) => {
   try {
     const items = await Inventory.find();
-    res.json(items);
-  } catch {
+    res.json(items); // Always JSON array
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch inventory" });
   }
 });
@@ -105,7 +116,8 @@ app.post("/inventory", isAuthenticated, async (req, res) => {
     const item = new Inventory(req.body);
     await item.save();
     res.json(item);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to add product" });
   }
 });
@@ -114,11 +126,13 @@ app.patch("/inventory/:id", isAuthenticated, async (req, res) => {
   try {
     const updated = await Inventory.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updated);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to update product" });
   }
 });
 
+// --- Sales API ---
 app.post("/sale", isAuthenticated, async (req, res) => {
   const { customer, items } = req.body;
   if (!customer || !items?.length) return res.status(400).json({ error: "Invalid sale data" });
@@ -156,7 +170,8 @@ app.post("/sale", isAuthenticated, async (req, res) => {
     const sale = new Sale({ customer, items: saleItems, total, profit });
     await sale.save();
     res.json({ success: true, sale });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Sale failed" });
   }
 });
@@ -165,11 +180,13 @@ app.get("/sales", isAuthenticated, async (req, res) => {
   try {
     const sales = await Sale.find().sort({ soldAt: -1 });
     res.json(sales);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch sales" });
   }
 });
 
+// --- Start Server ---
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
