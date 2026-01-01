@@ -1,0 +1,449 @@
+/* ================= Global Font & Body ================= */
+body {
+  font-family: 'Avantgarde', 'TeX Gyre Adventor', 'URW Gothic L', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url("images/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Make wrappers transparent so body background shows */
+.dashboard-wrapper,
+.checkout-container,
+form,
+table {
+  background-color: rgba(255, 255, 255, 0.9); /* semi-transparent */
+}
+
+/* ================= Top Navbar ================= */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo left, links center, logout right */
+  width: 100%;
+  height: 70px;
+  padding: 0 30px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.top-bar .logo img {
+  height: 50px;
+  width: auto;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center; /* Center the navbar items */
+  gap: 25px;
+  align-items: center;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar a:hover,
+.navbar a.active {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  box-shadow: none; /* Removed shadow */
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05);
+}
+
+/* Navbar adjustments */
+.navbar-container, #navbarContainer {
+  position: fixed;       /* Fix navbar at top */
+  top: 0;                /* Touch top of viewport */
+  left: 0;
+  width: 100%;
+  z-index: 1000;         /* Stay above page content */
+  display: flex;
+  justify-content: center; /* Center the navbar container */
+}
+
+/* ================= Forms ================= */
+form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"] {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  flex: 1 1 48%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.3s;
+  display: block;
+  margin: 0 auto;
+}
+
+button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+/* ================= Inventory Table (Glass Style) ================= */
+
+.inventory-table {
+  background-color: rgba(255, 255, 255, 0.15); /* transparent */
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Table headers */
+.inventory-table th {
+  background-color: rgba(76, 175, 80, 0.9);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Table cells */
+.inventory-table td {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* Borders softened */
+.inventory-table th,
+.inventory-table td {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Alternate rows */
+.inventory-table tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Edit button stays readable */
+.inventory-table .edit-btn {
+  background-color: #2196F3;
+  color: #fff;
+  border: none;
+}
+
+.inventory-table .edit-btn:hover {
+  background-color: #1976D2;
+}
+
+
+/* ================= Tables ================= */
+table {
+  width: 95%;
+  max-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 30px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+}
+
+td {
+  font-size: 14px;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.low-stock {
+  background-color: #ffe0e0;
+  font-weight: bold;
+}
+
+/* ================= Sales Cards ================= */
+.sale-card {
+  background: #f9f9f9;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.sale-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sale-card h3, .sale-card h4 {
+  margin: 0;
+  color: #333;
+}
+
+.sale-card p {
+  margin: 5px 0;
+}
+
+/* ================= Checkout Page ================= */
+.checkout-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 90%;
+  margin: 20px auto 40px auto;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.checkout-table {
+  flex: 1 1 60%;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  padding: 10px;
+}
+
+.checkout-table th,
+.checkout-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.checkout-table th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.checkout-total {
+  flex: 0 0 30%;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.checkout-total h2 {
+  margin: 0;
+}
+
+.checkout-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.checkout-item:last-child {
+  border-bottom: none;
+}
+
+.complete-sale-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.complete-sale-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* ================= Dashboard ================= */
+.dashboard-wrapper {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard {
+  width: 75%;
+  max-width: 1100px;
+  text-align: center;
+}
+
+.dashboard-cards {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  width: 260px;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  color: #4CAF50;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ================= Responsive ================= */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="date"] {
+    flex: 1 1 100%;
+  }
+  button {
+    width: 100%;
+  }
+  table {
+    width: 95% !important;
+  }
+  .checkout-container {
+    flex-direction: column;
+  }
+  .checkout-total {
+    align-items: flex-start;
+    width: 100%;
+  }
+  #logoutForm {
+    width: 100%;
+    text-align: right;
+  }
+}
+
+/* ================= Print ================= */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receiptPopup, #receiptPopup * {
+    visibility: visible;
+  }
+  #receiptPopup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}
+/* ================= Inventory Add Product Form ================= */
+
+.inventory-form {
+  background-color: rgba(255, 255, 255, 0.15); /* transparent */
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+}
+
+/* Labels & headings in white */
+.inventory-form label,
+.inventory-form h2,
+.inventory-form h3 {
+  color: #ffffff;
+}
+
+/* Inputs stay readable */
+.inventory-form input[type="text"],
+.inventory-form input[type="number"] {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #000;
+  border: none;
+}
+
+/* Placeholder text */
+.inventory-form input::placeholder {
+  color: #666;
+}
+
+/* Button stays green */
+.inventory-form button {
+  background-color: #4CAF50;
+  color: #ffffff;
+}
+
+.inventory-form button:hover {
+  background-color: #45a049;
+}
+

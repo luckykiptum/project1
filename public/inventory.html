@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Management</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ===== Page Styles ===== */
+    body {
+      font-family: 'Avantgarde', 'TeX Gyre Adventor', 'URW Gothic L', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: url("images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    /* ===== Form ===== */
+    form#addForm {
+      width: 90%;
+      margin: 0 auto 20px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background-color: rgba(255, 255, 255, 0.15); /* semi-transparent */
+      padding: 20px;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    form#addForm input {
+      flex: 1 1 48%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background-color: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    form#addForm input::placeholder {
+      color: #eee;
+    }
+
+    form#addForm button {
+      flex: 1 1 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    form#addForm button:hover {
+      background-color: #45a049;
+      transform: scale(1.03);
+    }
+
+    /* ===== Inventory Table ===== */
+    table#inventoryTable {
+      width: 90%;
+      margin: 0 auto 30px auto;
+      border-collapse: collapse;
+      background-color: #fff; /* full white */
+      color: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    table#inventoryTable th, table#inventoryTable td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    table#inventoryTable th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+
+    .edit-btn {
+      background: #2196F3;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* ===== Navbar container ===== */
+    #navbarContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      form#addForm input {
+        flex: 1 1 100%;
+      }
+
+      form#addForm button {
+        width: 100%;
+      }
+
+      table#inventoryTable {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbarContainer"></div>
+
+<h1>Inventory Management</h1>
+
+<!-- Add Product Form -->
+<form id="addForm">
+  <input type="text" id="name" placeholder="Product Name" required>
+  <input type="number" id="costPrice" placeholder="Cost Price" min="0" required>
+  <input type="number" id="price" placeholder="Selling Price" min="0" required>
+  <input type="number" id="quantity" placeholder="Quantity" min="0" required>
+  <button type="submit">Add Product</button>
+</form>
+
+<!-- Inventory Table -->
+<table id="inventoryTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Cost</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Inventory items populated via script.js -->
+  </tbody>
+</table>
+
+<script src="script.js"></script>
+
+<!-- Inject Navbar -->
+<script>
+  fetch('/navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbarContainer').innerHTML = html;
+
+      // Highlight current page link
+      const path = window.location.pathname;
+      if (path.includes("inventory")) document.getElementById("nav-inventory").classList.add("active");
+      if (path.includes("checkout")) document.getElementById("nav-checkout").classList.add("active");
+      if (path.includes("sales")) document.getElementById("nav-sales").classList.add("active");
+      if (path.includes("records")) document.getElementById("nav-records").classList.add("active");
+
+      // Logout button
+      const logoutForm = document.getElementById("logoutForm");
+      if(logoutForm){
+        logoutForm.addEventListener("submit", e => {
+          e.preventDefault();
+          fetch("/logout", { method:"POST" }).then(()=> window.location.href="/admin-login");
+        });
+      }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: 'Avantgarde', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: url("images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .filters {
+      width: 90%;
+      margin: 0 auto 20px auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      background-color: rgba(0,0,0,0.5);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .filters label {
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      font-weight: bold;
+      flex: 1 1 200px;
+    }
+
+    .filters input, .filters button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+
+    .filters button {
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .filters button:hover {
+      background-color: #43a047;
+    }
+
+    #salesContainer {
+      width: 90%;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sale-card {
+      background-color: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 12px;
+      color: #000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .sale-card h3 {
+      margin: 0 0 10px 0;
+      color: #4CAF50;
+    }
+
+    .sale-card table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .sale-card th, .sale-card td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+    }
+
+    .sale-card th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .sale-card td {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbarContainer"></div>
+
+<h1>Sales Report</h1>
+
+<!-- Filters -->
+<div class="filters">
+  <label>
+    Select Date:
+    <input type="date" id="datePicker">
+  </label>
+  <label>
+    Search Customer:
+    <input type="text" id="customerSearchInput">
+  </label>
+  <button id="searchBtn">Search</button>
+  <button id="resetBtn">Reset</button>
+</div>
+
+<div id="salesContainer"></div>
+
+<script>
+  // Navbar injection
+  fetch("navbar.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("navbarContainer").innerHTML = html;
+
+      // Highlight current page
+      const path = window.location.pathname;
+      if(path.includes("sales")) document.getElementById("nav-sales").classList.add("active");
+
+      // Logout handler
+      const logoutForm = document.getElementById("logoutForm");
+      if(logoutForm) {
+        logoutForm.addEventListener("submit", e => {
+          e.preventDefault();
+          fetch("/logout", { method:"POST" }).then(() => window.location.href = "/admin-login");
+        });
+      }
+    });
+
+  const salesContainer = document.getElementById("salesContainer");
+  const datePicker = document.getElementById("datePicker");
+  const customerSearchInput = document.getElementById("customerSearchInput");
+  const searchBtn = document.getElementById("searchBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  function fetchSales() {
+    fetch("/sales")
+      .then(res => res.json())
+      .then(data => {
+        displaySales(data);
+      });
+  }
+
+  function displaySales(sales) {
+    salesContainer.innerHTML = '';
+    sales.forEach(sale => {
+      // Filter by date
+      if(datePicker.value && new Date(sale.soldAt).toISOString().slice(0,10) !== datePicker.value) return;
+      // Filter by customer
+      if(customerSearchInput.value && !sale.customer.toLowerCase().includes(customerSearchInput.value.toLowerCase())) return;
+
+      const card = document.createElement("div");
+      card.className = "sale-card";
+
+      card.innerHTML = `
+        <h3>${sale.customer} - ${new Date(sale.soldAt).toLocaleString()}</h3>
+        <table>
+          <thead>
+            <tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            ${sale.items.map(i => `<tr>
+              <td>${i.product}</td>
+              <td>${i.quantity ?? 0}</td>
+              <td>${(i.price ?? 0).toFixed(2)}</td>
+              <td>${(i.total ?? 0).toFixed(2)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        <p><strong>Total: KES ${(sale.total ?? 0).toFixed(2)}</strong></p>
+      `;
+
+      salesContainer.appendChild(card);
+    });
+  }
+
+  searchBtn.addEventListener("click", fetchSales);
+  resetBtn.addEventListener("click", () => {
+    datePicker.value = '';
+    customerSearchInput.value = '';
+    fetchSales();
+  });
+
+  // Initial load
+  fetchSales();
+</script>
+
+</body>
+</html>

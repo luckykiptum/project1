@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Avantgarde', sans-serif;
+      background: url("images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* Page title */
+    h1.page-title {
+      text-align: center;
+      margin: 20px 0;
+      color: #fff; /* white text */
+      background-color: rgba(0,0,0,0.4); /* subtle dark background for contrast */
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 2rem;
+    }
+
+    /* ===== Form ===== */
+    form#checkoutForm {
+      width: 90%;
+      max-width: 900px;
+      margin: 20px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      background-color: rgba(255,255,255,0.15);
+      padding: 20px;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    form#checkoutForm label {
+      flex: 1 1 30%;
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+    }
+
+    form#checkoutForm input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background-color: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    form#checkoutForm input::placeholder {
+      color: #eee;
+    }
+
+    form#checkoutForm button {
+      flex: 1 1 100%;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    form#checkoutForm button:hover {
+      background-color: #45a049;
+      transform: scale(1.03);
+    }
+
+    /* ===== Cart Table ===== */
+    #cartContainer table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #fff; /* fully white like inventory */
+      color: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    #cartContainer th, #cartContainer td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    #cartContainer th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+
+    /* ===== Total ===== */
+    .total-section {
+      width: 90%;
+      max-width: 900px;
+      margin: 20px auto;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff; /* make total white on background */
+    }
+
+    /* ===== Receipt ===== */
+    #receiptPopup {
+      display: none;
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      background: #fff;
+      color: #000;
+      padding: 15px;
+      border: 1px dashed #000;
+      z-index: 9999;
+      font-family: monospace;
+      border-radius: 12px;
+    }
+
+    #receiptPopup table {
+      width: 100%;
+      font-size: 12px;
+      border-collapse: collapse;
+    }
+
+    #receiptPopup th, #receiptPopup td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+    }
+
+    #receiptPopup th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+
+    #receiptPopup button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #receiptPopup button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbarContainer"></div>
+
+<!-- Page Title -->
+<h1 class="page-title">Checkout</h1>
+
+<!-- Checkout Form -->
+<form id="checkoutForm">
+  <label>
+    Customer Name
+    <input type="text" id="customerName" placeholder="Enter customer name" required />
+  </label>
+
+  <label>
+    Product
+    <input type="text" id="productInput" list="productsList" placeholder="Select product" />
+    <datalist id="productsList"></datalist>
+  </label>
+
+  <label>
+    Quantity
+    <input type="number" id="sellQty" min="1" placeholder="Quantity" />
+  </label>
+
+  <div>
+    <p>Price: KES <span id="productPrice">0.00</span></p>
+    <p>Available: <span id="availableQty">0</span></p>
+  </div>
+
+  <button type="button" id="addToCartBtn">Add to Cart</button>
+  <button type="submit">Complete Sale</button>
+</form>
+
+<!-- Cart Table -->
+<div id="cartContainer"></div>
+
+<div class="total-section">
+  Total: KES <span id="totalAmount">0.00</span>
+</div>
+
+<!-- Receipt Popup -->
+<div id="receiptPopup">
+  <div style="text-align:center">
+    <h3>LUBREN ENTERPRISES</h3>
+    <p>Customer: <strong><span id="receiptCustomer"></span></strong></p>
+    <p>Date: <span id="receiptDate"></span></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody id="receiptItems"></tbody>
+  </table>
+
+  <button id="closeReceiptBtn">Close</button>
+</div>
+
+<script src="script.js"></script>
+
+<!-- Navbar injection -->
+<script>
+  fetch('/navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbarContainer').innerHTML = html;
+      const path = window.location.pathname;
+      if(path.includes("checkout")) document.getElementById("nav-checkout").classList.add("active");
+
+      const logoutForm = document.getElementById("logoutForm");
+      if(logoutForm){
+        logoutForm.addEventListener("submit", e => {
+          e.preventDefault();
+          fetch("/logout", { method:"POST" }).then(()=> window.location.href="/admin-login");
+        });
+      }
+    });
+</script>
+
+</body>
+</html>
