@@ -14,19 +14,17 @@
       min-height: 100vh;
     }
 
-    /* Page title */
     h1.page-title {
       text-align: center;
       margin: 20px 0;
-      color: #fff; /* white text */
-      background-color: rgba(0,0,0,0.4); /* subtle dark background for contrast */
+      color: #fff;
+      background-color: rgba(0,0,0,0.4);
       display: inline-block;
       padding: 10px 20px;
       border-radius: 12px;
       font-size: 2rem;
     }
 
-    /* ===== Form ===== */
     form#checkoutForm {
       width: 90%;
       max-width: 900px;
@@ -38,6 +36,7 @@
       padding: 20px;
       border-radius: 12px;
       color: #fff;
+      position: relative;
     }
 
     form#checkoutForm label {
@@ -45,6 +44,7 @@
       display: flex;
       flex-direction: column;
       font-weight: bold;
+      position: relative;
     }
 
     form#checkoutForm input {
@@ -60,7 +60,7 @@
     }
 
     form#checkoutForm button {
-      flex: 1 1 100%;
+      flex: 1 1 48%;
       padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
@@ -76,12 +76,12 @@
       transform: scale(1.03);
     }
 
-    /* ===== Cart Table ===== */
+    /* Cart Table */
     #cartContainer table {
       width: 90%;
       margin: 20px auto;
       border-collapse: collapse;
-      background-color: #fff; /* fully white like inventory */
+      background-color: #fff;
       color: #000;
       border-radius: 12px;
       overflow: hidden;
@@ -99,24 +99,23 @@
       color: #fff;
     }
 
-    /* ===== Total ===== */
     .total-section {
       width: 90%;
       max-width: 900px;
       margin: 20px auto;
       font-size: 1.2rem;
       font-weight: bold;
-      color: #fff; /* make total white on background */
+      color: #fff;
+      text-align: right;
     }
 
-    /* ===== Receipt ===== */
     #receiptPopup {
       display: none;
       position: fixed;
       top: 5%;
       left: 50%;
       transform: translateX(-50%);
-      width: 320px;
+      width: 350px;
       background: #fff;
       color: #000;
       padding: 15px;
@@ -157,17 +156,23 @@
     #receiptPopup button:hover {
       background-color: #45a049;
     }
+
+    .product-details {
+      flex: 1 1 100%;
+      margin-top: 10px;
+    }
+
+    .product-details p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <div id="navbarContainer"></div>
 
-<!-- Page Title -->
 <h1 class="page-title">Checkout</h1>
 
-<!-- Checkout Form -->
 <form id="checkoutForm">
   <label>
     Customer Name
@@ -185,7 +190,7 @@
     <input type="number" id="sellQty" min="1" placeholder="Quantity" />
   </label>
 
-  <div>
+  <div class="product-details">
     <p>Price: KES <span id="productPrice">0.00</span></p>
     <p>Available: <span id="availableQty">0</span></p>
   </div>
@@ -194,14 +199,12 @@
   <button type="submit">Complete Sale</button>
 </form>
 
-<!-- Cart Table -->
 <div id="cartContainer"></div>
 
 <div class="total-section">
   Total: KES <span id="totalAmount">0.00</span>
 </div>
 
-<!-- Receipt Popup -->
 <div id="receiptPopup">
   <div style="text-align:center">
     <h3>LUBREN ENTERPRISES</h3>
@@ -224,16 +227,14 @@
   <button id="closeReceiptBtn">Close</button>
 </div>
 
-<script src="script.js"></script>
-
-<!-- Navbar injection -->
 <script>
+  // Load navbar dynamically
   fetch('/navbar.html')
     .then(res => res.text())
     .then(html => {
       document.getElementById('navbarContainer').innerHTML = html;
       const path = window.location.pathname;
-      if(path.includes("checkout")) document.getElementById("nav-checkout").classList.add("active");
+      if(path.includes("checkout")) document.getElementById("nav-checkout")?.classList.add("active");
 
       const logoutForm = document.getElementById("logoutForm");
       if(logoutForm){
@@ -244,6 +245,7 @@
       }
     });
 </script>
+<script src="script.js"></script>
 
 </body>
 </html>

@@ -150,46 +150,92 @@
   const searchBtn = document.getElementById("searchBtn");
   const resetBtn = document.getElementById("resetBtn");
 
+  // ===== FIX: define fetchSales =====
   function fetchSales() {
     fetch("/sales")
       .then(res => res.json())
-      .then(data => {
-        displaySales(data);
-      });
+      .then(data => displaySales(data))
+      .catch(err => console.error("Failed to fetch sales:", err));
   }
 
   function displaySales(sales) {
     salesContainer.innerHTML = '';
+
     sales.forEach(sale => {
-      // Filter by date
-      if(datePicker.value && new Date(sale.soldAt).toISOString().slice(0,10) !== datePicker.value) return;
-      // Filter by customer
-      if(customerSearchInput.value && !sale.customer.toLowerCase().includes(customerSearchInput.value.toLowerCase())) return;
+      const items = Array.isArray(sale.items) ? sale.items : [];
+
+      const soldAt = sale.sold_at || sale.soldAt;
+      if (!soldAt) return;
+
+      const saleDate = new Date(soldAt);
+
+      // Filters
+      if (datePicker.value && saleDate.toISOString().slice(0, 10) !== datePicker.value) return;
+      if (
+        customerSearchInput.value &&
+        !String(sale.customer || "")
+          .toLowerCase()
+          .includes(customerSearchInput.value.toLowerCase())
+      ) return;
+
+      let total = 0;
+      let totalProfit = 0;
+
+      const rows = items.map(i => {
+        const qty = Number(i.quantity || 0);
+        const price = Number(i.price || 0);
+        const cost = Number(i.cost || 0);
+
+        const itemTotal = Number(i.total ?? (qty * price));
+        const itemProfit = Number(i.profit ?? ((price - cost) * qty));
+
+        total += itemTotal;
+        totalProfit += itemProfit;
+
+        return `
+          <tr>
+            <td>${i.product || i.name || "Unknown Product"}</td>
+            <td>${qty}</td>
+            <td>${price.toFixed(2)}</td>
+            <td>${itemTotal.toFixed(2)}</td>
+          </tr>
+        `;
+      }).join("");
 
       const card = document.createElement("div");
       card.className = "sale-card";
 
       card.innerHTML = `
-        <h3>${sale.customer} - ${new Date(sale.soldAt).toLocaleString()}</h3>
+        <h3>
+          ${sale.customer || "Unknown Customer"} –
+          ${saleDate.toLocaleString()}
+        </h3>
+
         <table>
           <thead>
-            <tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
           </thead>
           <tbody>
-            ${sale.items.map(i => `<tr>
-              <td>${i.product}</td>
-              <td>${i.quantity ?? 0}</td>
-              <td>${(i.price ?? 0).toFixed(2)}</td>
-              <td>${(i.total ?? 0).toFixed(2)}</td>
-            </tr>`).join('')}
+            ${rows || `<tr><td colspan="4">No items</td></tr>`}
           </tbody>
         </table>
-        <p><strong>Total: KES ${(sale.total ?? 0).toFixed(2)}</strong></p>
+
+        <p><strong>Total: KES ${total.toFixed(2)}</strong></p>
+        <p style="color:#2e7d32;">
+          <strong>Profit: KES ${totalProfit.toFixed(2)}</strong>
+        </p>
       `;
 
       salesContainer.appendChild(card);
     });
   }
+
+
 
   searchBtn.addEventListener("click", fetchSales);
   resetBtn.addEventListener("click", () => {

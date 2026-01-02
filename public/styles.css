@@ -425,17 +425,22 @@ tr:nth-child(even) {
 }
 
 /* Inputs stay readable */
+/* Inventory input fields */
 .inventory-form input[type="text"],
 .inventory-form input[type="number"] {
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #000;
+  background-color: rgba(255, 255, 255, 0.15); /* keep glassy transparent */
+  color: #ffffff; /* text typed by user is white */
   border: none;
+  padding: 10px;
+  border-radius: 5px;
 }
 
-/* Placeholder text */
+/* Placeholder text white */
 .inventory-form input::placeholder {
-  color: #666;
+  color: #ffffff; /* placeholder text white */
+  opacity: 1;     /* full visibility */
 }
+
 
 /* Button stays green */
 .inventory-form button {
@@ -446,4 +451,18 @@ tr:nth-child(even) {
 .inventory-form button:hover {
   background-color: #45a049;
 }
+form#addForm input {
+  flex: 1 1 48%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: rgba(255,255,255,0.2);
+  color: #fff; /* typed text is white */
+}
+
+form#addForm input::placeholder {
+  color: #ffffff; /* placeholder text white */
+  opacity: 1;
+}
+
 

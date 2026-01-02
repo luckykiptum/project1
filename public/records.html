@@ -127,85 +127,103 @@
 </table>
 
 <script>
-  // Navbar injection
-  fetch("navbar.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("navbarContainer").innerHTML = html;
+  document.addEventListener("DOMContentLoaded", () => {
 
-      // Highlight current page
-      if(window.location.pathname.includes("records")) {
-        document.getElementById("nav-records")?.classList.add("active");
-      }
+    // Navbar injection
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbarContainer").innerHTML = html;
 
-      const logoutForm = document.getElementById("logoutForm");
-      if(logoutForm) {
-        logoutForm.addEventListener("submit", e => {
-          e.preventDefault();
-          fetch("/logout", { method: "POST" }).then(() => window.location.href = "/admin-login");
-        });
-      }
-    });
+        // Highlight current page
+        if(window.location.pathname.includes("records")) {
+          document.getElementById("nav-records")?.classList.add("active");
+        }
 
-  const salesData = document.getElementById("salesData");
-  const datePicker = document.getElementById("datePicker");
-  const customerSearchInput = document.getElementById("customerSearchInput");
-  const searchBtn = document.getElementById("searchBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const totalProfitEl = document.getElementById("totalProfit");
-
-  let allSales = [];
-
-  function fetchSales() {
-    fetch("/sales")
-      .then(res => res.json())
-      .then(data => {
-        allSales = data;
-        renderSales();
+        const logoutForm = document.getElementById("logoutForm");
+        if(logoutForm) {
+          logoutForm.addEventListener("submit", e => {
+            e.preventDefault();
+            fetch("/logout", { method: "POST" }).then(() => window.location.href = "/admin-login");
+          });
+        }
       });
-  }
 
-  function renderSales() {
-    salesData.innerHTML = '';
-    let totalProfit = 0;
-    let lastDate = '';
-    allSales.forEach(sale => {
-      const saleDate = new Date(sale.soldAt).toLocaleDateString();
-      if(datePicker.value && saleDate !== new Date(datePicker.value).toLocaleDateString()) return;
-      if(customerSearchInput.value && !sale.customer.toLowerCase().includes(customerSearchInput.value.toLowerCase())) return;
+    const salesData = document.getElementById("salesData");
+    const datePicker = document.getElementById("datePicker");
+    const customerSearchInput = document.getElementById("customerSearchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const totalProfitEl = document.getElementById("totalProfit");
 
-      if(lastDate !== saleDate){
-        const tr = document.createElement("tr");
-        tr.className = "day-header";
-        tr.innerHTML = `<td colspan="5">${saleDate}</td>`;
-        salesData.appendChild(tr);
-        lastDate = saleDate;
+    let allSales = [];
+
+    async function fetchSales() {
+      try {
+        const res = await fetch("/sales");
+        const data = await res.json();
+        allSales = Array.isArray(data) ? data : [];
+        renderSales();
+      } catch (err) {
+        console.error("Failed to fetch sales:", err);
       }
+    }
 
-      const productsStr = (sale.items || []).map(i => `${i.product || ''} (x${i.quantity ?? 0})`).join(', ');
+    function renderSales() {
+      salesData.innerHTML = '';
+      let totalProfit = 0;
+      let lastDate = '';
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${new Date(sale.soldAt).toLocaleTimeString()}</td>
-                      <td>${sale.customer || ''}</td>
-                      <td>${productsStr}</td>
-                      <td>${(sale.total ?? 0).toFixed(2)}</td>
-                      <td>${(sale.profit ?? 0).toFixed(2)}</td>`;
-      salesData.appendChild(tr);
-      totalProfit += sale.profit ?? 0;
+      allSales.forEach(sale => {
+        const saleDateObj = new Date(sale.sold_at || sale.soldAt || Date.now());
+        if (isNaN(saleDateObj)) return;
+        const saleDate = saleDateObj.toLocaleDateString();
+
+        // Filter by date
+        if (datePicker.value && saleDate !== new Date(datePicker.value).toLocaleDateString()) return;
+        // Filter by customer
+        if (customerSearchInput.value && !String(sale.customer).toLowerCase().includes(customerSearchInput.value.toLowerCase())) return;
+
+        // Day header
+        if (lastDate !== saleDate) {
+          const tr = document.createElement("tr");
+          tr.className = "day-header";
+          tr.innerHTML = `<td colspan="5">${saleDate}</td>`;
+          salesData.appendChild(tr);
+          lastDate = saleDate;
+        }
+
+        // Map products correctly
+        const items = Array.isArray(sale.items) ? sale.items : [];
+        const productsStr = items.length 
+          ? items.map(i => `${i.product || i.name || 'Unknown'} (x${i.quantity ?? 0})`).join(', ')
+          : 'N/A';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${saleDateObj.toLocaleTimeString()}</td>
+          <td>${sale.customer || 'N/A'}</td>
+          <td>${productsStr}</td>
+          <td>${Number(sale.total ?? 0).toFixed(2)}</td>
+          <td>${Number(sale.profit ?? 0).toFixed(2)}</td>
+        `;
+        salesData.appendChild(tr);
+
+        totalProfit += Number(sale.profit ?? 0);
+      });
+
+      totalProfitEl.textContent = `Total Profit: KES ${totalProfit.toFixed(2)}`;
+    }
+
+    searchBtn.addEventListener("click", renderSales);
+    resetBtn.addEventListener("click", () => {
+      datePicker.value = '';
+      customerSearchInput.value = '';
+      renderSales();
     });
 
-    totalProfitEl.textContent = `Total Profit: KES ${totalProfit.toFixed(2)}`;
-  }
-
-  searchBtn.addEventListener("click", renderSales);
-  resetBtn.addEventListener("click", () => {
-    datePicker.value = '';
-    customerSearchInput.value = '';
-    renderSales();
+    fetchSales();
   });
-
-  // Initial load
-  fetchSales();
 </script>
 
 </body>
