@@ -41,8 +41,8 @@ app.use(
 
 /* ================= Admin Credentials ================= */
 const adminCredentials = {
-  username: process.env.ADMIN_USER || "admin",
-  password: process.env.ADMIN_PASS || "password"
+  username: process.env.ADMIN_USER || "nerbul",
+  password: process.env.ADMIN_PASS || "brenluck7968"
 };
 
 /* ================= Auth Middleware ================= */
